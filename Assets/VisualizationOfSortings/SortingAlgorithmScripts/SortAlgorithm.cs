@@ -43,23 +43,15 @@ public abstract class SortAlgorithm
         OnElementOnRightPlace?.Invoke(positionOfElement);
     }
 
-    public static IComparable[] SwitchToIComparable<T>(T[] tab)
+    public static IComparable[] ConvertToIComparable<T>(T[] tab) where T : IComparable
     {
-        if (!(tab[0] is IComparable))
-        {
-            Debug.LogError("Error cant switch to IComparable, because argument dont implement IComparable interface");
-        }
-        else
-        {
-            IComparable[] comparebales = new IComparable[tab.Length];
+        IComparable[] comparebales = new IComparable[tab.Length];
 
-            for (int i = 0; i < tab.Length; i++)
-            {
-                comparebales[i] = (IComparable)tab[i];
-            }
-            return comparebales;
+        for (int i = 0; i < tab.Length; i++)
+        {
+            comparebales[i] = (IComparable)tab[i];
         }
-
-        return null;
+        
+        return comparebales;
     }
 }

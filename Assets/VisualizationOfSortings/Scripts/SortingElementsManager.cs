@@ -17,14 +17,12 @@ public class SortingElementsManager : MonoBehaviour
     [ContextMenu("SetStartValuesToSortingElements")]
     private void SetStartValuesToSortingElements()
     {
- 
         int i = 0;
         foreach (var sortingElemenent in sortingElements)
         {         
             sortingElemenent.value.text = sortAlgorithmSteps.rollingElements[i].ToString();
             i++;
         }
-
     }
 
     public void SetPositionToSortingElement(int indexOfElement, Vector3 position)

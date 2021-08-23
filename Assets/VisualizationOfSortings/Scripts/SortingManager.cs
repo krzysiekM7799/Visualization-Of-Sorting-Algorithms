@@ -5,11 +5,18 @@ using UnityEngine;
 
 public class SortingManager : MonoBehaviour
 {
-    SortAlgorithm sortAlgorithm;
-    SortAlgorithmStatistics sortAlgorithmStatistics;
-    public SortAlgorithmSteps sortAlgorithmSteps;
-    public SortingElementsManager sortingElementsManager;
-    public CharacterController characterController;
+    private SortAlgorithm sortAlgorithm;
+    private SortAlgorithmStatistics sortAlgorithmStatistics;
+    private SortAlgorithmSteps sortAlgorithmSteps;
+    private SortingElementsManager sortingElementsManager;
+    private CharacterController characterController;
+    [SerializeField] private static int numberElementsToSort;
+
+    private void Awake()
+    {
+        characterController = FindObjectOfType<CharacterController>();
+        sortingElementsManager = GetComponent<SortingElementsManager>();
+    }
 
     void Start()
     {
@@ -28,29 +35,12 @@ public class SortingManager : MonoBehaviour
             SortingCommand currentCommand = oldCommands[i];
 
             currentCommand.Execute();
-
-            switch (currentCommand.sortingCommandType)
-            {
-                case SortingCommandType.Swap:
-                    SwapCommand swapCommand = currentCommand as SwapCommand;
-                    characterController.SwapElements(swapCommand.positionOfFirstElement, swapCommand.positionOfFirstElement);
-                    characterState = CharacterController.CharacterState.Swap;
-
-                    break;
-                case SortingCommandType.Compare:
-                    ComparisionCommand comparisionCommand = currentCommand as ComparisionCommand;
-                    characterController.CompareElements(comparisionCommand.positionOfFirstElement, comparisionCommand.positionOfSecondElement);
-                    characterState = CharacterController.CharacterState.Compare;
-                    break;
-                case SortingCommandType.SetGoodPlace:
-                    characterState = CharacterController.CharacterState.SetRightPlace;
-                    break;
-            }
-            while(characterController.characterState == characterState)
+            characterController.PerformAction(currentCommand);
+            characterState = characterController.CurrentCharacterState;
+            while (characterController.CurrentCharacterState == characterState)
             {
                 yield return null;
             }
-            yield return new WaitForSeconds(1);
         }
         yield return null;
     }
@@ -62,13 +52,14 @@ public class SortingManager : MonoBehaviour
         sortAlgorithmSteps = new SortAlgorithmSteps(sortAlgorithm);
         sortingElementsManager.SetAlgorithmSteps(sortAlgorithmSteps);
         int[] tab = MakeDataForSorting();
-        IComparable[] ints = SortAlgorithm.SwitchToIComparable<int>(tab);
+        IComparable[] ints = SortAlgorithm.ConvertToIComparable<int>(tab);
+ 
         sortAlgorithm.Sort(ints);
     }
 
     private static int[] MakeDataForSorting()
     {
-        int[] tab = new int[5];
+        int[] tab = new int[numberElementsToSort];
         int j = 0;
         for (int i = tab.Length - 1; i >= 0; i--)
         {
